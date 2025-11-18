@@ -1,0 +1,49 @@
+
+services:
+  client:
+    image: node:22-alpine
+    command: ["npm", "run", "dev"]
+    volumes:
+      - ./client:/app
+    working_dir: /app
+    ports:
+      - "3000:3000"
+
+  db:
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=Srish@2004
+      - MYSQL_DATABASE=ray_hair_db
+    ports:
+      - "3306:3306"
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-pSrish@2004"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    
+  server:
+    image: node:22-alpine
+    command: ["npm", "run", "dev"]
+    volumes:
+      - ./server:/app
+    working_dir: /app
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - BASE_URL=http://localhost:8000
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=Srish@2004
+      - DB_NAME=ray_hair_db
+      - DB_SSL=false
+      - JWT_SECRET=1f2c65a6f44f6751512fb4f634cbe98c08a737e922328a07a5ea53fc906e797f40b298f3581d59a155f1a9a2c9ffa694aa34577d67750a3f7722864b523a3f7b
+      - CLOUDINARY_CLOUD_NAME=dsfznithw
+      - CLOUDINARY_API_KEY=764433535376812
+      - CLOUDINARY_API_SECRET=JHIq0toC7d6f-DD2BWMfm9VjTYA
+    depends_on:
+      db:
+        condition: service_healthy
